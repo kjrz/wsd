@@ -1,2 +1,2 @@
 # WSD
-Multi-agent systems uni assignment
+multi-agent systems uni assignment
