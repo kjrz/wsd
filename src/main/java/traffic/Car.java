@@ -3,5 +3,6 @@ package traffic;
 /**
  * @author kjrz
  */
-public class Car {
+public interface Car {
+
 }
