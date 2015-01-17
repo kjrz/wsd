@@ -1,5 +1,6 @@
 package traffic;
 
+import road.Position;
 import road.Road;
 
 /**
@@ -17,20 +18,22 @@ public class CarWithSystem implements Car {
         this.road = road;
     }
 
-    public int clearAhead(int range) {
-        return road.seeAhead(position, range);
+    @Override
+    public int look(int range) {
+        return road.look(position, range);
     }
 
-    public void stepAhead() {
-        position = road.stepAhead(position);
+    @Override
+    public void move(int steps) {
+        position = road.move(position, steps);
     }
 
     @Override
     public String toString() {
-        return id;
+        Position p = road.getPosition(position);
+        return String.format("%s@(%d, %d)", id, p.x, p.y);
     }
 
-    // TODO: close time frame and notify rode
-
-    // TODO: add agent and listen to agent
+    // TODO: listen to agent
+    // TODO: listen to driver
 }

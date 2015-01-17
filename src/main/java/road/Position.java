@@ -19,4 +19,9 @@ public class Position {
         this.y = y;
         this.lights = lights;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%d, %d)", x, y);
+    }
 }

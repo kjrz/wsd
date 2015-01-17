@@ -17,7 +17,10 @@ public class Route {
     }
 
     public int next(int current) {
-        return current + 1 < steps.size() ? current + 1 : 0;
+        int next = current + 1;
+        if (next == steps.size()) next = 0;
+        if (steps.get(next).lights) return next(next);
+        else return next;
     }
 
     public int size() {

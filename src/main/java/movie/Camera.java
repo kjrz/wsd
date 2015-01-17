@@ -1,7 +1,11 @@
 package movie;
 
+import java.util.Set;
+
 /**
  * @author kjrz
  */
-public class Camera {
+public interface Camera {
+
+    public void nextTimeFrame(Set<Integer> positions);
 }
