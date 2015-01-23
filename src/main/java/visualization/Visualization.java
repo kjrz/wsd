@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -19,8 +20,15 @@ import java.util.Set;
 
 public class Visualization extends Canvas implements Camera {
 
-    public BufferStrategy bufferStrategy;
-    Set<Integer> positions;
+    public final int GREEN_LIGHT = 1;
+    public final int YELLOW_LIGHT = 2;
+    public final int RED_LIGHT = 3;
+    public final int RED_YELLOW_LIGHT = 4;
+
+    private BufferStrategy bufferStrategy;
+    private Set<Integer> positions;
+
+    public int light;
 
     Visualization(){
         JFrame frame = new JFrame();
@@ -34,20 +42,25 @@ public class Visualization extends Canvas implements Camera {
         createBufferStrategy(2);
         bufferStrategy = getBufferStrategy();
         requestFocus();
+
+        light = GREEN_LIGHT;
     }
 
 
     private Position calculatePosition(int p){
 
         int x, y, a;
-        if(p > 3278){
-            p = p%3260;
-        }
+//        if(p > 3278){
+//            p = p%3260;
+//        }
+        p = p%3260;
 
         if(p > 0 && p < 670){
             x = p+50;
             y = 50;
-            a = 0;
+            a = 270 + 5*p;
+            if(a > 360)
+                a = 0;
         }
         else if(p >= 670 && p < 810){
             x = 720;
@@ -98,17 +111,12 @@ public class Visualization extends Canvas implements Camera {
             if(a > 270)
                 a = 270;
         }
-        else if(p >= 3260 ){
+        else {
             x = 50 + p -3260;
             y = 50;
             a = 270 + 5*(p-3260);
             if(a > 360)
                 a = 0;
-        }
-        else{
-            x = 50;
-            y = 50;
-            a = 50;
         }
         Position pos = new Position(x, y, a);
         return pos;
@@ -139,7 +147,32 @@ public class Visualization extends Canvas implements Camera {
     }
 
     private void drawLights(Graphics2D g){
-
+        Rectangle2D rect = new Rectangle2D.Double(330, 70, 20, 60);
+        g.setColor(Color.gray);
+        g.fill(rect);
+        g.setColor(Color.black);
+        g.draw(rect);
+        Ellipse2D.Double circle = new Ellipse2D.Double(330, 70, 20, 20);
+        if(light == RED_LIGHT || light == RED_YELLOW_LIGHT){
+            g.setColor(Color.red);
+            g.fill(circle);
+            g.setColor(Color.black);
+        }
+        g.draw(circle);
+        circle = new Ellipse2D.Double(330, 90, 20, 20);
+        if(light == YELLOW_LIGHT|| light == RED_YELLOW_LIGHT){
+            g.setColor(Color.yellow);
+            g.fill(circle);
+            g.setColor(Color.black);
+        }
+        g.draw(circle);
+        circle = new Ellipse2D.Double(330, 110, 20, 20);
+        if(light == GREEN_LIGHT){
+            g.setColor(Color.green);
+            g.fill(circle);
+            g.setColor(Color.black);
+        }
+        g.draw(circle);
     }
 
 
@@ -158,6 +191,8 @@ public class Visualization extends Canvas implements Camera {
         for(int p: positions){
             drawCar(g, p);
         }
+
+        drawLights(g);
 
         bufferStrategy.show();
     }
