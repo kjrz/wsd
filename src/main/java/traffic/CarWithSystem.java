@@ -1,5 +1,7 @@
-package traffic;
+package main.java.traffic;
 
+import main.java.road.Position;
+import main.java.road.Road;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -11,8 +13,6 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import road.Position;
-import road.Road;
 
 /**
  * @author kjrz
@@ -23,10 +23,16 @@ public class CarWithSystem extends Agent implements Car {
 
     private int position;
     private AID leader;
-	int v; //
-	int fps = 25;
-	int period = 1000 / fps;
+    private int v; 
+	private int fps = 10;
+	private int period = 1000 / fps;
 
+    public CarWithSystem(String id, Road road) {
+        this.position = 0;
+        this.id = id;
+        this.road = road;
+    }
+	
     public CarWithSystem(int position, String id, Road road) {
         this.position = position;
         this.id = id;
@@ -59,14 +65,15 @@ public class CarWithSystem extends Agent implements Car {
 
 			public void action()
 			{
-//
-//				if (pos != 0)
-//				{
-//					position = pos - 1; //ustaw sie za poprzednikiem
-//					// i wyslij do niego wiadomosc
-//					ACLMessage ask = new ACLMessage(ACLMessage.REQUEST);
-//					// TODO jak dodac adresata?
-//				}				
+				int pos = look(v);
+				if (pos != 0)
+				{
+					position = pos - 1; //ustaw sie za poprzednikiem
+					// i wyslij do niego wiadomosc
+					ACLMessage ask = new ACLMessage(ACLMessage.REQUEST);
+					// TODO jak dodac adresata?
+					
+				}				
 
 			}
 			public boolean done()
@@ -149,7 +156,8 @@ public class CarWithSystem extends Agent implements Car {
 			{
 				if (leader.getLocalName().equals(getAID().getLocalName())) //[lider] wyslij predkosc do powiazanych samochodow
 				{						
-					move(v);
+					if (look(v) == 0) move(v);
+					else move(look(v)-1);
 					
 					DFAgentDescription dfd = new DFAgentDescription();
 					ServiceDescription sd = new ServiceDescription();
@@ -182,7 +190,7 @@ public class CarWithSystem extends Agent implements Car {
 						fe.printStackTrace();
 					}
 					
-					v++;
+					if (v < 20) v++;
 				}				
 			}
 		});
@@ -196,7 +204,8 @@ public class CarWithSystem extends Agent implements Car {
 				if (msg != null)
 				{
 					int n = Integer.parseInt(msg.getContent());
-					move(n);
+					if (look(n) != 0) move(n);
+					else move (look(n)-1);
 					
 				} else
 					block();					
