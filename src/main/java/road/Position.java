@@ -2,6 +2,7 @@ package road;
 
 /**
  * @author kjrz
+ * @author mlaszko
  */
 public class Position {
     public final int x;
