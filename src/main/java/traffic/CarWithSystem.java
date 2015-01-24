@@ -1,7 +1,7 @@
-package main.java.traffic;
+package traffic;
 
-import main.java.road.Position;
-import main.java.road.Road;
+import road.Position;
+import road.Road;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -14,9 +14,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-/**
- * @author kjrz
- */
 public class CarWithSystem extends Agent implements Car {
     private final String id;
     private final Road road;
@@ -55,9 +52,6 @@ public class CarWithSystem extends Agent implements Car {
         return String.format("%s@(%d, %d)", id, p.x, p.y);
     }
 
-    // TODO: listen to agent
-    // TODO: listen to driver
-    
 	protected void setup()
 	{
 		addBehaviour(new Behaviour() //samochod stanal w korku, wyslij zapytanie o dolaczenie 
