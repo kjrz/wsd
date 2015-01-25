@@ -4,6 +4,7 @@ import movie.Camera;
 import traffic.Car;
 import traffic.CarWithSystem;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,8 @@ public class Road {
     private final Set<Camera> cams = new HashSet<>();
     private Set<Integer> positions = new HashSet<>();
     private Set<Integer> nextPositions = new HashSet<>();
+    private ArrayList<Localization> location = new ArrayList<>();
+
 
     public Road(Route route) {
         this.route = route;
@@ -23,6 +26,7 @@ public class Road {
     public CarWithSystem addCarWithSystem(int position, String id) {
         assertPosition(position);
         positions.add(position);
+        location.add(new Localization(position, id));
         return new CarWithSystem(position, id, this);
     }
 
@@ -51,10 +55,13 @@ public class Road {
         return 0;
     }
 
-    public int move(int position, int steps) {
+    public int move(int position, int steps, String id) {
+    	int temp = position;
         for (int i = 0; i < steps; i++) position = route.next(position);
         if (nextPositions.contains(position)) throw new Car.CrashException();
         nextPositions.add(position);
+        location.remove(new Localization(temp, id));
+        location.add(new Localization(position, id));
         if (nextPositions.size() == positions.size()) timeFrameEnd();
         return position;
     }
@@ -77,5 +84,11 @@ public class Road {
 
     public Position getPosition(int i) {
         return route.get(i);
+    }
+    
+    public String getId(int position)
+    {
+    	Localization loc = location.get(location.indexOf(new Localization(position,"")));
+    	return loc.getId(position);
     }
 }

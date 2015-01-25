@@ -14,6 +14,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+/**
+ * @author wilge
+ */
+
+
 public class CarWithSystem extends Agent implements Car {
     private final String id;
     private final Road road;
@@ -21,12 +26,14 @@ public class CarWithSystem extends Agent implements Car {
     private int position;
     private AID leader;
     private int v; 
+    private int vmax = 20;
 	private int fps = 10;
 	private int period = 1000 / fps;
-
-    public CarWithSystem(String id, Road road) {
+	
+	
+    public CarWithSystem(Road road) {
         this.position = 0;
-        this.id = id;
+        this.id = getAID().getLocalName();
         this.road = road;
     }
 	
@@ -43,7 +50,7 @@ public class CarWithSystem extends Agent implements Car {
 
     @Override
     public void move(int steps) {
-        position = road.move(position, steps);
+        position = road.move(position, steps, id);
     }
 
     @Override
@@ -62,10 +69,19 @@ public class CarWithSystem extends Agent implements Car {
 				int pos = look(v);
 				if (pos != 0)
 				{
-					position = pos - 1; //ustaw sie za poprzednikiem
+					position += pos - 1; //ustaw sie za poprzednikiem
+					v = 0;
+					String ahead = road.getId(position+pos);
 					// i wyslij do niego wiadomosc
 					ACLMessage ask = new ACLMessage(ACLMessage.REQUEST);
-					// TODO jak dodac adresata?
+					ask.addReceiver(new AID(ahead,AID.ISLOCALNAME));
+					try
+					{
+						DFService.deregister(myAgent);
+					} catch (FIPAException e)
+					{
+						e.printStackTrace();
+					}
 					
 				}				
 
@@ -184,7 +200,7 @@ public class CarWithSystem extends Agent implements Car {
 						fe.printStackTrace();
 					}
 					
-					if (v < 20) v++;
+					if (v < vmax) v++;
 				}				
 			}
 		});
@@ -198,8 +214,16 @@ public class CarWithSystem extends Agent implements Car {
 				if (msg != null)
 				{
 					int n = Integer.parseInt(msg.getContent());
-					if (look(n) != 0) move(n);
-					else move (look(n)-1);
+					if (look(n) != 0) 
+					{
+						v = n;
+						move(v);						
+					}
+					else 
+					{
+						v = n-1;
+						move (look(n)-1);
+					}
 					
 				} else
 					block();					
@@ -215,6 +239,16 @@ public class CarWithSystem extends Agent implements Car {
 		});	
 	}
 
+	protected void takeDown()
+	{
+		try
+		{
+			DFService.deregister(this);
+		} catch (FIPAException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 }
 
